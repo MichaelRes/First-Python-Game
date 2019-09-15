@@ -5,12 +5,18 @@ screenwidth = 500
 win = pygame.display.set_mode((screenwidth,screenwidth))
 pygame.display.set_caption("First Game")
 
-#Images
 walkRight = [pygame.image.load('Data/R%s.png' % frame) for frame in range(1, 10)] 
 walkLeft = [pygame.image.load('Data/L%s.png' % frame) for frame in range(1, 10)]
 bg = pygame.image.load('Data/bg.jpg')
 char = pygame.image.load('Data/standing.png')
+
 clock = pygame.time.Clock()
+
+bulletSound = pygame.mixer.Sound('Data/bullet.wav')
+hitSound = pygame.mixer.Sound('Data/hit.wav')
+
+music = pygame.mixer.music.load ('Data/music.mp3')
+pygame.mixer.music.play(-1)
 
 score = 0
 
@@ -156,6 +162,7 @@ while run:
     for bullet in bullets:
         if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
             if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
+                hitSound.play()
                 goblin.hit()
                 score +=1
                 bullets.pop(bullets.index(bullet))
@@ -170,6 +177,7 @@ while run:
     keys = pygame.key.get_pressed() #return a list of booleans for the entire keyboard
 
     if keys[pygame.K_SPACE] and shootLoop ==0:
+        bulletSound.play()
         if Stef.left:
             facing = -1
         else:
