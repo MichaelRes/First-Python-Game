@@ -6,12 +6,11 @@ win = pygame.display.set_mode((screenwidth,screenwidth))
 pygame.display.set_caption("First Game")
 
 #Images
-
 walkRight = [pygame.image.load('Data/R%s.png' % frame) for frame in range(1, 10)] 
 walkLeft = [pygame.image.load('Data/L%s.png' % frame) for frame in range(1, 10)]
-
 bg = pygame.image.load('Data/bg.jpg')
 char = pygame.image.load('Data/standing.png')
+
 
 class player(object):
     def __init__(self, x, y, width, height):
@@ -58,7 +57,46 @@ class projectile(object):
         pygame.draw.circle(win,self.color, (self.x, self.y), self.radius) 
 
 
+class enemy(object):
+    walkRight = [pygame.image.load('Data/R%sE.png' % frame) for frame in range(1, 12)] 
+    walkLeft = [pygame.image.load('Data/L%sE.png' % frame) for frame in range(1, 12)]
 
+    def __init__(self, x, y, width, height, end):
+        self.x=x
+        self.y=y
+        self.width=width
+        self.height=height
+        self.end=end
+        self.path = [self.x, self.end]
+        self.walkCount=0
+        self.vel = 3
+    
+    def draw(self, win):
+        self.move()
+        if self.walkCount + 1 >= 33:
+            self.walkCount = 0
+        
+        if self.vel > 0:
+            win.blit(self.walkRight[self.walkCount //3], (self.x, self.y))
+            self.walkCount +=1
+        else:
+            win.blit(self.walkLeft[self.walkCount //3], (self.x, self.y))
+            self.walkCount +=1
+
+    def move(self):
+        if self.vel>0:
+            if self.x + self.vel < self.path[1]:
+                self.x += self.vel
+
+            else:
+                self.vel = self.vel * -1
+                self.walkcount = 0
+        else:
+            if self.x - self.vel > self.path[0]:
+                self.x += self.vel 
+            else:
+                self.vel = self.vel * -1
+                self.walkcount = 0
 
 
 #List of parameters
@@ -73,6 +111,7 @@ def redrawGameWindow():
 
     win.blit(bg, (0,0))
     Stef.draw(win)
+    goblin.draw(win)
 
     for bullet in bullets:
         bullet.draw(win)
@@ -81,6 +120,7 @@ def redrawGameWindow():
 
 #mainloop
 Stef = player (300, 410, 64, 64) 
+goblin = enemy (100, 410, 64, 64, 450)
 bullets = []
 run = True
 while run:
