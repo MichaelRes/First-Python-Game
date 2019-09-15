@@ -56,6 +56,8 @@ class player(object):
         #pygame.draw.rect (win, (255,0,0), self.hitbox,2)
 
     def hit (self):
+        self.isJump = False
+        self.jumpCount = 10
         self.x = 60
         self.y = 410
         self.walkCount = 0
@@ -141,12 +143,11 @@ class enemy(object):
             self.health -=1
         else:
             self.visible = False
-        print("hit")
 
 def redrawGameWindow():
     win.blit(bg, (0,0))
     text = font.render('Score: ' + str(score), 1, (0,0,0))
-    win.blit(text, (390,10))
+    win.blit(text, (350,10))
     Stef.draw(win)
     goblin.draw(win)
 
@@ -163,13 +164,16 @@ goblin = enemy (100, 410, 64, 64, 450)
 shootLoop = 0
 bullets = []
 run = True
+
 while run:
     clock.tick(27)
 
-    if Stef.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and Stef.hitbox[1] + Stef.hitbox[3] > goblin.hitbox[1]:
-            if Stef.x + Stef.hitbox[2] > goblin.hitbox[0] and Stef.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
-                Stef.hit()
-                score -=5
+    #Collision between Stef and the goblin
+    if goblin.visible==True:
+        if Stef.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and Stef.hitbox[1] + Stef.hitbox[3] > goblin.hitbox[1]:
+                if Stef.x + Stef.hitbox[2] > goblin.hitbox[0] and Stef.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+                    Stef.hit()
+                    score -=5
 
     if shootLoop > 0:
         shootLoop +=1
@@ -180,13 +184,16 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    
     for bullet in bullets:
-        if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
-            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
-                hitSound.play()
-                goblin.hit()
-                score +=1
-                bullets.pop(bullets.index(bullet))
+        #Collision between bullets and the goblin
+        if goblin.visible==True:
+            if bullet.y - bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
+                if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] + goblin.hitbox[2]:
+                    hitSound.play()
+                    goblin.hit()
+                    score +=1
+                    bullets.pop(bullets.index(bullet))
 
         if bullet.x < 500 and bullet.x >0:
             bullet.x +=bullet.vel
